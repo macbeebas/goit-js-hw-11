@@ -4,19 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./sass/index.scss" />
+    <script src="./index.js" type="module"></script>
     <title>Homework 11</title>
   </head>
   <body>
-    <form class="search-form" id="search-form">
-      <input
-        type="text"
-        name="searchQuery"
-        autocomplete="off"
-        placeholder="Search images..."
-      />
-      <button type="submit">Search</button>
-    </form>
-
-    <script src="index.js" type="module"></script>
+    <div class="container">
+      <form class="search-form" id="search-form">
+        <input hidden name="page" type="number" value="1" />
+        <input
+          type="text"
+          class="search-input"
+          name="q"
+          autocomplete="off"
+          placeholder="Search images..."
+          value=""
+        />
+        <input type="submit" hidden />
+        <!-- <button type="submit" hidden>Search</button> -->
+      </form>
+      <div class="gallery" id="photos"></div>
+    </div>
   </body>
 </html>
