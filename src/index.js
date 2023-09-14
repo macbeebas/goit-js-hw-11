@@ -1,5 +1,3 @@
-// Key for me: 39270567-a82d11f42742c28a9e6d14c5c
-//
 import axios from 'axios';
 
 import Notiflix from 'notiflix';
@@ -40,8 +38,12 @@ async function runPixabay({ q = '', page = '1' }) {
       return [];
     }
 
-    const { hits: photos } = await response.json();
-
+    const { hits: photos, totalHits: hits } = await response.json();
+    if (hits === 0) {
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+    } else Notiflix.Notify.success(`Hooray! We found ${hits} images.`);
     return photos;
   } catch (e) {
     Notiflix.Notify.failure(
@@ -96,7 +98,6 @@ async function loadPhotos({ q, page }) {
 
 async function searchForPhotos(e) {
   e.preventDefault();
-
   e.target.page.value = '1';
   const q = e.target.q.value;
 
@@ -117,7 +118,6 @@ async function scrollHandler() {
 const searchForm = document.querySelector('#search-form');
 searchForm.addEventListener('submit', searchForPhotos);
 
-// scrollHandler();
 window.addEventListener('scroll', scrollHandler);
 
 let lightbox = new SimpleLightbox('.gallery a', {
