@@ -24,8 +24,8 @@ async function runPixabay({ q = '', page = '1' }) {
       q,
     });
 
-    const response = await fetch(`${API_PATH}?${querystring}`);
-    if (!response.ok) {
+    const response = await axios.get(`${API_PATH}?${querystring}`);
+    if (!response.status === 200) {
       if (response.status === 400) {
         Notiflix.Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.'
@@ -37,8 +37,8 @@ async function runPixabay({ q = '', page = '1' }) {
       );
       return [];
     }
-
-    const { hits: photos, totalHits: hits } = await response.json();
+    const photos = response.data.hits;
+    const hits = response.data.totalHits;
     if (hits === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
@@ -100,7 +100,6 @@ async function searchForPhotos(e) {
   e.preventDefault();
   e.target.page.value = '1';
   const q = e.target.q.value;
-
   await loadPhotos({ q, page: '1' });
 }
 
