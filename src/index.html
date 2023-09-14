@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="upgrade-insecure-requests"
+    />
     <link rel="stylesheet" href="./sass/index.scss" />
     <script src="./index.js" type="module"></script>
     <title>Homework 11</title>
@@ -20,7 +24,6 @@
           value=""
         />
         <input type="submit" hidden />
-        <!-- <button type="submit" hidden>Search</button> -->
       </form>
       <div class="gallery" id="photos"></div>
     </div>

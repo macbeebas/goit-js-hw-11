@@ -18,7 +18,7 @@ const DEFAULT_PIXABAY_PARAMS = {
   safesearch: 'true',
 };
 
-async function pingPixabay({ q = '', page = '1' }) {
+async function runPixabay({ q = '', page = '1' }) {
   try {
     const querystring = new URLSearchParams({
       ...DEFAULT_PIXABAY_PARAMS,
@@ -27,12 +27,8 @@ async function pingPixabay({ q = '', page = '1' }) {
     });
 
     const response = await fetch(`${API_PATH}?${querystring}`);
-    console.log('30. "response" is OK?: ', response.ok);
     if (!response.ok) {
-      console.log('32. Error! "response" is OK?: ', response.ok);
-
       if (response.status === 400) {
-        console.log('35. Error! "response.status" is: ', response.status);
         Notiflix.Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.'
         );
@@ -41,9 +37,7 @@ async function pingPixabay({ q = '', page = '1' }) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
-      console.log('44. response.status: ', response.status);
       return [];
-      //   return { error: response.status };
     }
 
     const { hits: photos } = await response.json();
@@ -53,26 +47,24 @@ async function pingPixabay({ q = '', page = '1' }) {
     Notiflix.Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
-    console.log('56. e.toString(): ', e.toString());
     return;
-    // return { error: e.toString() };
   }
 }
 
-const getPhotoElement = photo => {
+const createPhotoElement = photo => {
   const photoElement = document.createElement('a');
   photoElement.href = photo.largeImageURL;
   photoElement.classList.add('photo-card');
 
   const photoElementContent = `\n<img src="${photo.webformatURL}" alt="${photo.tags}" loading="lazy" />`;
   const photoElementInfo = `
-<div class="info">
-  <p class="info-item"><b>Likes</b><br />${photo.likes}</p>
-  <p class="info-item"><b>Views</b><br />${photo.views}</p>
-  <p class="info-item"><b>Comments</b><br />${photo.comments}</p>
-  <p class="info-item"><b>Downloads</b><br />${photo.downloads}</p>
-</div>
-`;
+  <div class="info">
+    <p class="info-item"><b>Likes</b><br />${photo.likes}</p>
+    <p class="info-item"><b>Views</b><br />${photo.views}</p>
+    <p class="info-item"><b>Comments</b><br />${photo.comments}</p>
+    <p class="info-item"><b>Downloads</b><br />${photo.downloads}</p>
+  </div>
+  `;
   photoElement.insertAdjacentHTML('afterbegin', photoElementContent);
   photoElement.insertAdjacentHTML('beforeend', photoElementInfo);
 
@@ -85,18 +77,17 @@ function drawPhotos({ photos, page }) {
     photoContainer.innerHTML = '';
   }
 
-  const children = photos.map(getPhotoElement);
+  const children = photos.map(createPhotoElement);
   photoContainer.append(...children);
+  lightbox.refresh();
 }
 
 async function loadPhotos({ q, page }) {
-  const photos = await pingPixabay({ q, page });
+  const photos = await runPixabay({ q, page });
   if (photos.error) {
     Notiflix.Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
-    // alert(photos.error);
-    console.log('99. photos.error: ', photos.error);
     return;
   }
   drawPhotos({ photos, page });
@@ -114,7 +105,8 @@ async function searchForPhotos(e) {
 
 async function scrollHandler() {
   const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-  if (scrollTop + clientHeight >= scrollHeight) {
+
+  if (Math.ceil(scrollTop) + clientHeight >= scrollHeight) {
     const searchForm = document.querySelector('#search-form');
     const page = parseInt(searchForm.page.value);
     searchForm.page.value = page + 1;
@@ -125,7 +117,7 @@ async function scrollHandler() {
 const searchForm = document.querySelector('#search-form');
 searchForm.addEventListener('submit', searchForPhotos);
 
-scrollHandler();
+// scrollHandler();
 window.addEventListener('scroll', scrollHandler);
 
 let lightbox = new SimpleLightbox('.gallery a', {
